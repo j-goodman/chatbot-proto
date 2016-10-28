@@ -1,11 +1,12 @@
+<script type='text/javascript' src='./dictionary.js'></script>
 <script type='text/javascript' src='./chatbot.js'></script>
 
 <div id='output'></div>
-<input type='text' id='input' value='' placeholder='Input here.'>
+<input type='text' id='input' value='' placeholder='The input is down here, say hello!'>
 
 <style media="screen">
   body {
-    background: #000;
+    background: #f4fcff;
   }
 
   #input {
@@ -16,12 +17,19 @@
   }
 
   #input, #output {
-    background: #000;
-    border: 1px solid #efd;
-    color: #efd;
+    background: #fff;
+    border: 1px solid #37c;
     display: block;
     font-family: monospace;
     font-size: 16px;
+  }
+
+  use, #input {
+    color: #37c;
+  }
+
+  bot {
+    color: #1a5;
   }
 
   #output {
