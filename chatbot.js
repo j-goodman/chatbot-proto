@@ -108,18 +108,14 @@ window.onload = function () {
     console.log(this.hangmanWord);
     window.setTimeout(function () {
       var num;
-      if (this.hangmanWord.length < 21) {
-        num = this.numNames[this.hangmanWord.length];
-      } else {
-        num = this.hangmanWord.length;
-      }
+      num = this.nameNum(this.hangmanWord.length);
       this.enterText("Okay, got it. It's " + num + " letters long. Now guess a letter and I'll tell you if you're right.");
     }.bind(this), 1000);
     this.game = 'start-hangman';
   };
 
   robot.displayHangmanWord = function () {
-    var output; var word; var xx;
+    var output; var word; var xx; var guessesText; var points;
     output = '';
     word = this.hangmanWord.split('');
     for (xx=0 ; xx < word.length ; xx++) {
@@ -131,11 +127,22 @@ window.onload = function () {
     }
     if (!output.includes('*')) {
       window.setTimeout(function () {
-        this.enterText("Alright, you won! Do you want to play again?");
+        points = this.incorrectLetters.length;
+        guessesText = "";
+        if (points < 6) {
+          guessesText = "Only " + this.nameNum(points) + " guesses, so it looks like you win this time!";
+        } else if (points < 12) {
+          guessesText = "It took you " + this.nameNum(points) + " guesses though!";
+        } else {
+          guessesText = "It took you " + this.nameNum(points) + " guesses though, so it looks like I win this one!";
+        }
+        this.enterText("That's the word! " + guessesText + " Do you want to play again?");
         this.listenFor(["yes", "sure", "okay", "play", "yeah"], function () {
           this.clearListeners();
           this.enterText("Great!");
-          this.playHangman();
+          window.setTimeout(function () {
+            this.playHangman();
+          }.bind(this), 1000);
         }.bind(this));
         this.listenFor(["no", "don't", "not", "enough"], function () {
           this.clearListeners();
@@ -158,7 +165,7 @@ window.onload = function () {
       this.listenFor(["no", "not"], function () {
         this.clearListeners();
         this.enterText("Alright, then you can only guess one letter at a time.");
-      });
+      }.bind(this));
     } else if (input.length === 1) {
       if (this.correctLetters.includes(input) || this.incorrectLetters.includes(input)) {
         this.enterText("You already guessed that one.");
@@ -177,11 +184,7 @@ window.onload = function () {
           reply = "No " + input.toUpperCase() + '.';
         }
         if (this.incorrectLetters.length > 4 && (dice(1,10) > 3)) {
-          if (this.incorrectLetters.length < 21) {
-            num = this.numNames[this.incorrectLetters.length];
-          } else {
-            num = this.incorrectLetters.length;
-          }
+          num = this.nameNum(this.incorrectLetters.length);
           reply += " That's " + num + " wrong guesses!";
         }
         this.enterText(reply);
@@ -195,6 +198,14 @@ window.onload = function () {
   robot.activeListeners = [];
 
   robot.numNames = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen', 'twenty'];
+
+  robot.nameNum = function (num) {
+    if (num < this.numNames.length) {
+      return this.numNames[num];
+    } else {
+      return num.toString();
+    }
+  };
 
   robot.clearListeners = function () {
     var xx;
