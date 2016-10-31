@@ -455,4 +455,5 @@ window.onload = function () {
   window.setTimeout(function () {
     robot.introduce();
   }, 1600);
+  console.log('Bot loaded.');
 };
