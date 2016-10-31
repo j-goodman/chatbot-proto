@@ -115,11 +115,7 @@ window.onload = function () {
     console.log(this.hangmanWord);
     window.setTimeout(function () {
       var num;
-      if (this.hangmanWord.length < 21) {
-        num = this.numNames[this.hangmanWord.length];
-      } else {
-        num = this.hangmanWord.length;
-      }
+      num = this.nameNum(this.hangmanWord.length);
       this.enterText("Okay, got it. It's " + num + " letters long. Now guess a letter and I'll tell you if you're right.");
     }.bind(this), 1000);
     this.game = 'start-hangman';
@@ -278,7 +274,7 @@ window.onload = function () {
   };
 
   robot.displayHangmanWord = function () {
-    var output; var word; var xx;
+    var output; var word; var xx; var guessesText; var points;
     output = '';
     word = this.hangmanWord.split('');
     for (xx=0 ; xx < word.length ; xx++) {
@@ -302,7 +298,7 @@ window.onload = function () {
       this.listenFor(["no", "not"], function () {
         this.clearListeners();
         this.enterText("Alright, then you can only guess one letter at a time.");
-      });
+      }.bind(this));
     } else if (input.length === 1) {
       if (this.correctLetters.includes(input) || this.incorrectLetters.includes(input)) {
         this.enterText("You already guessed that one.");
@@ -338,11 +334,7 @@ window.onload = function () {
           reply = "No " + input.toUpperCase() + '.';
         }
         if (this.incorrectLetters.length > 4 && (dice(1,10) > 3)) {
-          if (this.incorrectLetters.length < 21) {
-            num = this.numNames[this.incorrectLetters.length];
-          } else {
-            num = this.incorrectLetters.length;
-          }
+          num = this.nameNum(this.incorrectLetters.length);
           reply += " That's " + num + " wrong guesses!";
         }
         if (this.incorrectLetters.length >= 6) {
@@ -383,6 +375,14 @@ window.onload = function () {
   robot.activeListeners = [];
 
   robot.numNames = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen', 'twenty'];
+
+  robot.nameNum = function (num) {
+    if (num < this.numNames.length) {
+      return this.numNames[num];
+    } else {
+      return num.toString();
+    }
+  };
 
   robot.clearListeners = function () {
     var xx;
