@@ -1,6 +1,6 @@
 window.onload = function () {
   // elements:
-  var inputField; var outputField;
+  var inputField; var outputField; var canvasField;
   // objects:
   var robot={}; var user={};
   // functions:
@@ -8,6 +8,7 @@ window.onload = function () {
 
   inputField = document.getElementById('input');
   outputField = document.getElementById('output');
+  canvasField = document.getElementById('canvas');
 
   append = function (appendedObj, baseObj) {
     var keys; var ii;
@@ -34,7 +35,7 @@ window.onload = function () {
       inputField.value = '';
       inputField.placeholder = '';
       robot.respond(input);
-      window.scrollBy(0, 100);
+      window.scrollBy(0, 250);
     }
   };
   document.onkeydown = keypress;
@@ -43,9 +44,15 @@ window.onload = function () {
     if (text) {
       window.setTimeout(function () {
         outputField.innerHTML += '<bot>Me: ' + text + '</bot><br>';
-        window.scrollBy(0, 100);
+        window.scrollBy(0, 250);
       }, dice(100, 1000));
     }
+  };
+
+
+  robot.enterImage = function (src) {
+    outputField.innerHTML += '<img src='+src+'></img><br>';
+    window.scrollBy(0, 250);
   };
 
   robot.keywords = {
@@ -118,6 +125,158 @@ window.onload = function () {
     this.game = 'start-hangman';
   };
 
+  robot.generateWrongGuessGIF = function (letter, wrongGuesses) {
+    encoder = new GIFEncoder();
+    encoder.setRepeat(1);
+    encoder.setDelay(200);
+    encoder.start();
+
+    var ctx;
+    ctx = canvas.getContext('2d');
+    ctx.fillStyle = "#fff";
+    ctx.fillRect(0,0,400,400);
+    ctx.font = '120pt monospace';
+    ctx.fillStyle = "#000";
+    ctx.fillText(letter, 148, 224);
+    encoder.addFrame(ctx);
+    ctx.font = '150pt sans-serif';
+    ctx.fillStyle = "#f00";
+    ctx.fillText('X', 132, 252);
+    encoder.addFrame(ctx);
+
+    ctx.fillStyle = "#fff";
+    ctx.fillRect(0,0,400,400);
+    ctx.beginPath();
+    ctx.moveTo(50,400);
+    ctx.lineTo(50,350);
+    ctx.lineTo(350,350);
+    ctx.lineTo(350,400);
+    ctx.moveTo(100,350);
+    ctx.lineTo(100,50);
+    ctx.lineTo(240,50);
+    ctx.lineTo(240,100);
+    ctx.stroke();
+
+    if (wrongGuesses > 0) {
+      ctx.beginPath();
+      ctx.arc(240,130,30,0,2*Math.PI);
+      ctx.strokeStyle = "#000";
+      ctx.stroke();
+      encoder.addFrame(ctx);
+    }
+
+    if (wrongGuesses > 1) {
+      ctx.moveTo(224, 156);
+      ctx.lineTo(224, 220);
+      ctx.lineTo(256, 220);
+      ctx.lineTo(256, 156);
+      ctx.strokeStyle = "#000";
+      ctx.stroke();
+      encoder.addFrame(ctx);
+    }
+
+    if (wrongGuesses > 2) {
+      ctx.moveTo(224, 156);
+      ctx.lineTo(206, 212);
+      ctx.strokeStyle = "#000";
+      ctx.stroke();
+      encoder.addFrame(ctx);
+    }
+
+    if (wrongGuesses > 3) {
+      ctx.moveTo(256, 156);
+      ctx.lineTo(274, 212);
+      ctx.strokeStyle = "#000";
+      ctx.stroke();
+      encoder.addFrame(ctx);
+    }
+
+    if (wrongGuesses > 4) {
+      ctx.moveTo(224, 220);
+      ctx.lineTo(224, 280);
+      ctx.strokeStyle = "#000";
+      ctx.stroke();
+      encoder.addFrame(ctx);
+    }
+
+    if (wrongGuesses > 5) {
+      ctx.moveTo(256, 220);
+      ctx.lineTo(256, 280);
+      ctx.strokeStyle = "#000";
+      ctx.stroke();
+      encoder.addFrame(ctx);
+    }
+
+    encoder.addFrame(ctx);
+    encoder.addFrame(ctx);
+    encoder.addFrame(ctx);
+    encoder.addFrame(ctx);
+    encoder.addFrame(ctx);
+    encoder.addFrame(ctx);
+    encoder.finish();
+    binaryGif = encoder.stream().getData();
+    dataURL = 'data:image/gif;base64,'+encode64(binaryGif);
+    return dataURL;
+  };
+
+  robot.generateRightGuessGIF = function (letter, word, correctLetters) {
+    var offset; var xx; var space; var size;
+    letter = letter.toLowerCase();
+    word = word.toLowerCase();
+    encoder = new GIFEncoder();
+    encoder.setRepeat(1);
+    encoder.setDelay(500);
+    encoder.start();
+
+    var ctx;
+    ctx = canvas.getContext('2d');
+    ctx.fillStyle = "#fff";
+    ctx.fillRect(0,0,400,400);
+    size = 42-word.length;
+    ctx.font = size+'pt monospace';
+    ctx.fillStyle = "#000";
+    space = 36-word.length;
+    offset = 200-((word.length/2)*space);
+    word = word.split('');
+    for (xx=0 ; xx < word.length ; xx++) {
+      if (correctLetters.includes(word[xx])) {
+        ctx.fillText(word[xx], offset+(space*xx), 220);
+      } else {
+        ctx.fillText('-', offset+(space*xx), 220);
+      }
+    }
+    encoder.addFrame(ctx);
+    ctx.fillStyle = "#fff";
+    ctx.fillRect(0,0,400,400);
+    ctx.fillStyle = "#000";
+    for (xx=0 ; xx < word.length ; xx++) {
+      if (correctLetters.includes(word[xx])) {
+        ctx.fillText(word[xx], offset+(space*xx), 220);
+      } else if (word[xx]===letter) {
+        ctx.fillStyle = "#0c0";
+        ctx.fillText(word[xx], offset+(space*xx), 220);
+        ctx.fillStyle = "#000";
+      } else {
+        ctx.fillText('-', offset+(space*xx), 220);
+      }
+    }
+    encoder.addFrame(ctx);
+    for (xx=0 ; xx < word.length ; xx++) {
+      if (correctLetters.includes(word[xx]) || word[xx]===letter) {
+        ctx.fillText(word[xx], offset+(space*xx), 220);
+      } else {
+        ctx.fillText('-', offset+(space*xx), 220);
+      }
+    }
+    encoder.addFrame(ctx);
+    encoder.addFrame(ctx);
+    encoder.addFrame(ctx);
+    encoder.finish();
+    binaryGif = encoder.stream().getData();
+    dataURL = 'data:image/gif;base64,'+encode64(binaryGif);
+    return dataURL;
+  };
+
   robot.displayHangmanWord = function () {
     var output; var word; var xx;
     output = '';
@@ -128,21 +287,6 @@ window.onload = function () {
       } else {
         output += '*';
       }
-    }
-    if (!output.includes('*')) {
-      window.setTimeout(function () {
-        this.enterText("Alright, you won! Do you want to play again?");
-        this.listenFor(["yes", "sure", "okay", "play", "yeah"], function () {
-          this.clearListeners();
-          this.enterText("Great!");
-          this.playHangman();
-        }.bind(this));
-        this.listenFor(["no", "don't", "not", "enough"], function () {
-          this.clearListeners();
-          this.enterText("Okay, let's hang out again some time!");
-        }.bind(this));
-        this.game = '';
-      }.bind(this), 1000);
     }
     this.enterText(output);
   };
@@ -164,7 +308,24 @@ window.onload = function () {
         this.enterText("You already guessed that one.");
       } else if (this.hangmanWord.includes(input)) {
         this.enterText("Good guess.");
+        var src = robot.generateRightGuessGIF(input, this.hangmanWord, this.correctLetters);
+        robot.enterImage(src);
         this.correctLetters.push(input);
+        if (this.wordIsGuessed()) {
+          window.setTimeout(function () {
+            this.enterText("Alright, you won! Do you want to play again?");
+            this.listenFor(["yes", "sure", "okay", "play", "yeah"], function () {
+              this.clearListeners();
+              this.enterText("Great!");
+              this.playHangman();
+            }.bind(this));
+            this.listenFor(["no", "don't", "not", "enough"], function () {
+              this.clearListeners();
+              this.enterText("Okay, see you around then!");
+            }.bind(this));
+            this.game = '';
+          }.bind(this), 1000);
+        }
       } else {
         this.incorrectLetters.push(input);
         var rand; var reply; var num;
@@ -184,12 +345,39 @@ window.onload = function () {
           }
           reply += " That's " + num + " wrong guesses!";
         }
-        this.enterText(reply);
+        if (this.incorrectLetters.length >= 6) {
+          this.enterText('Looks like you lose this round! The word was "'+this.hangmanWord+'"! Do you want to play again?');
+          this.listenFor(["yes", "sure", "okay", "play", "yeah"], function () {
+            this.clearListeners();
+            this.enterText("Great!");
+            this.playHangman();
+          }.bind(this));
+          this.listenFor(["no", "don't", "not", "enough"], function () {
+            this.clearListeners();
+            this.enterText("Okay, see you around then!");
+          }.bind(this));
+          this.game = '';
+        } else {
+          this.enterText(reply);
+        }
+        window.setTimeout(function () {
+          var gifsrc = this.generateWrongGuessGIF(input.toUpperCase(), this.incorrectLetters.length);
+          this.enterImage(gifsrc);
+        }.bind(this), 1);
       }
-      window.setTimeout(function () {
-        this.displayHangmanWord();
-      }.bind(this), 250);
     }
+  };
+
+  robot.wordIsGuessed = function () {
+    var word; var xx; var correct;
+    correct = true;
+    word = this.hangmanWord.split('');
+    for (xx=0 ; xx < word.length ; xx++) {
+      if (!this.correctLetters.includes(word[xx])) {
+        correct = false;
+      }
+    }
+    return correct;
   };
 
   robot.activeListeners = [];
@@ -225,7 +413,7 @@ window.onload = function () {
     if (randPercent < 20) {
       response = "I didn't understand that, sorry.";
     } else if (randPercent < 30) {
-      response = "Sorry, I can't understand that.";
+      response = "Sorry, I can't understand what you said.";
     } else if (randPercent < 50) {
       response = "I don't understand";
     } else if (randPercent < 70) {
@@ -264,4 +452,7 @@ window.onload = function () {
       this.enterText(this.dontUnderstand());
     }
   };
+  window.setTimeout(function () {
+    robot.introduce();
+  }, 1600);
 };

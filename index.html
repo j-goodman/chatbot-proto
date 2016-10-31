@@ -1,8 +1,14 @@
+<script type='text/javascript' src='jsgif/LZWEncoder.js'></script>
+<script type='text/javascript' src='jsgif/NeuQuant.js'></script>
+<script type='text/javascript' src='jsgif/GIFEncoder.js'></script>
+<script type='text/javascript' src='jsgif/b64.js'></script>
+
 <script type='text/javascript' src='./dictionary.js'></script>
 <script type='text/javascript' src='./chatbot.js'></script>
 
 <div id='output'></div>
-<input type='text' id='input' value='' placeholder='The input is down here, say hello!'>
+<input type='text' id='input' value='' placeholder='Input is down here!'>
+<canvas id='canvas' width='400' height='400'></canvas>
 
 <style media="screen">
   body {
@@ -32,11 +38,24 @@
     color: #1a5;
   }
 
+  img {
+    box-shadow: 0px 0px 3px #bbb;
+    height: 200px;
+    width: 200px;
+  }
+
   #output {
     line-height: 22px;
     margin: 60px auto 0px auto;
     min-height: 200px;
     padding: 6px 12px 6px 12px;
     width: 624px;
+  }
+
+  #canvas {
+    background: #000;
+    border: 1px solid #ccc;
+    display: none;
+    margin: auto;
   }
 </style>
