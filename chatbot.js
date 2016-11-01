@@ -29,7 +29,7 @@ window.onload = function () {
 
   keypress = function (e) {
     var input;
-    if (e.key==='Enter') {
+    if (e.keyCode===13) {
       input = inputField.value;
       outputField.innerHTML += '<use>You: ' + input + '</use><br>';
       inputField.value = '';
